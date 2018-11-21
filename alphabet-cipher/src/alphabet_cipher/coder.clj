@@ -32,6 +32,9 @@
    :y "yzabcdefghijklmnopqrstuvwx"
    :z "zabcdefghijklmnopqrstuvwxy"})
 
+(defn char-to-key [c]
+  (keyword (str c)))
+
 
 (defn decode [keyword message]
   "decodeme")
