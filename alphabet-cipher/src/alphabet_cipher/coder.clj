@@ -35,6 +35,20 @@
 (defn char-to-key [c]
   (keyword (str c)))
 
+;; Returns the keyword repeated til a given length
+(defn keyword-repeater [keyword secret]
+  (let [keyword-length (count keyword)
+        secret-length (count secret)]
+    (cond (> keyword-length secret-length)
+          (subs keyword 0 secret-length)
+          (= keyword-length secret-length)
+          keyword
+          (< keyword-length secret-length)
+          (loop [key keyword]
+            (if (< (count key) secret-length)
+              (recur (str key key))
+              (subs key 0 secret-length))))))
+
 
 (defn decode [keyword message]
   "decodeme")
