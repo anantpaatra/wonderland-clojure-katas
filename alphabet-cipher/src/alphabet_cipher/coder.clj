@@ -50,10 +50,23 @@
                (take message-length)
                (apply str)))))
 
+(defn get-encoded-letter [letter-x rows letter-y columns]
+  (get ((char-to-key letter-x) rows) ((char-to-key letter-y) columns)))
+
+(defn encode [keyword message]
+  (let [expanded-keyword (expand-keyword keyword message)]
+    (loop [[char-of-key & rest-of-key] expanded-keyword
+           [char-of-message & rest-of-message] message
+           encoded-message ""]
+      (if (char? char-of-key)
+        (recur rest-of-key rest-of-message
+               (->> (get-encoded-letter char-of-key substitution-chart
+                                        char-of-message columns)
+                    (str encoded-message)))
+        encoded-message))))
 
 (defn decode [keyword message]
   "decodeme")
 
 (defn decipher [cipher message]
   "decypherme")
-
