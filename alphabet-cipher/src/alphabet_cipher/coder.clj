@@ -53,6 +53,12 @@
 (defn get-encoded-letter [letter-x rows letter-y columns]
   (get ((char-to-key letter-x) rows) ((char-to-key letter-y) columns)))
 
+(defn get-decoded-letter [c c2]
+  (let [position (columns (char-to-key c))]
+    (->> (filter #(= c2 (nth (second %) position)) substitution-chart)
+         (into {})
+         (apply #(second (clojure.string/join %))))))
+
 (defn encode [keyword message]
   (let [expanded-keyword (expand-keyword keyword message)]
     (loop [[char-of-key & rest-of-key] expanded-keyword
@@ -66,7 +72,15 @@
         encoded-message))))
 
 (defn decode [keyword message]
-  "decodeme")
+  (let [expanded-keyword (expand-keyword keyword message)]
+    (loop [[char-of-key & rest-of-key] expanded-keyword
+           [char-of-message & rest-of-message] message
+           encoded-message ""]
+      (if (char? char-of-key)
+        (recur rest-of-key rest-of-message
+               (->> (get-decoded-letter char-of-key char-of-message)
+                    (str encoded-message)))
+        encoded-message))))
 
 (defn decipher [cipher message]
   "decypherme")
