@@ -35,32 +35,22 @@
 (defn char-to-key [c]
   (keyword (str c)))
 
-
-;; Returns the keyword repeated til a given length
-;; Updated solution based on feedback in #beginners
-(defn expand-keyword [key message]
-  (let [key-length (count key)
-        message-length (count message)]
-    (cond (> key-length message-length)
-          (subs key 0 message-length)
-          (= key-length message-length)
+(defn expand-keyword [key desired-length]
+  (let [key-length (count key)]
+    (cond (> key-length desired-length)
+          (subs key 0 desired-length)
+          (= key-length desired-length)
           key
-          (< key-length message-length)
+          (< key-length desired-length)
           (->> (cycle key)
-               (take message-length)
+               (take desired-length)
                (apply str)))))
 
 (defn get-encoded-letter [letter-x rows letter-y columns]
   (get ((char-to-key letter-x) rows) ((char-to-key letter-y) columns)))
 
-(defn get-decoded-letter [c c2]
-  (let [position (columns (char-to-key c))]
-    (->> (filter #(= c2 (nth (second %) position)) substitution-chart)
-         (into {})
-         (apply #(second (clojure.string/join %))))))
-
 (defn encode [keyword message]
-  (let [expanded-keyword (expand-keyword keyword message)]
+  (let [expanded-keyword (expand-keyword keyword (count message))]
     (loop [[char-of-key & rest-of-key] expanded-keyword
            [char-of-message & rest-of-message] message
            encoded-message ""]
