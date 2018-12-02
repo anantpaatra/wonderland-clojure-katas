@@ -63,8 +63,14 @@
                     (str encoded-message)))
         encoded-message))))
 
+(defn get-decoded-letter [c c2]
+  (let [position (columns (char-to-key c))]
+    (->> (filter #(= c2 (nth (second %) position)) substitution-chart)
+         (into {})
+         (apply #(second (s/join %))))))
+
 (defn decode [keyword message]
-  (let [expanded-keyword (expand-keyword keyword message)]
+  (let [expanded-keyword (expand-keyword keyword (count message))]
     (loop [[char-of-key & rest-of-key] expanded-keyword
            [char-of-message & rest-of-message] message
            encoded-message ""]
