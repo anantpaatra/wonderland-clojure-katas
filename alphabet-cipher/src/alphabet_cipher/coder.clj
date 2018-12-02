@@ -80,5 +80,40 @@
                     (str encoded-message)))
         encoded-message))))
 
+(defn base-cipher-extractor [full-cipher]
+  (let [first-char-of-cipher (first full-cipher)
+        full-cipher-length (count full-cipher)]
+    (loop [[character & rest-of-cipher] (s/join (rest full-cipher))
+           counter 1]
+      (if (= character first-char-of-cipher)
+        (let [precedent (subs full-cipher 0 counter)
+              subsequent (subs full-cipher counter full-cipher-length)
+              precedent-length (count precedent)
+              subsequent-length (count subsequent)]
+          (if (<= subsequent-length precedent-length)
+            (if (= subsequent (subs precedent 0 subsequent-length))
+              precedent
+              (str precedent (first subsequent)))
+            (if (= (expand-keyword precedent full-cipher-length) full-cipher)
+              precedent
+              (recur rest-of-cipher (inc counter)))))
+        (recur rest-of-cipher (inc counter))))))
+
+(defn get-cipher-letter [char-of-cipher char-of-message]
+  (let [row ((char-to-key char-of-message) substitution-chart)
+        inverted-columns (map-invert columns)]
+    (->> (keep-indexed #(if (= %2 char-of-cipher) %1) row)
+         (first)
+         (get inverted-columns)
+         (str)
+         (last))))
+
 (defn decipher [cipher message]
-  "decypherme")
+  (loop [[char-of-cipher & rest-of-cipher] cipher
+         [char-of-message & rest-of-message] message
+         full-cipher ""]
+    (if (char? char-of-cipher)
+      (recur rest-of-cipher rest-of-message
+             (->> (get-cipher-letter char-of-cipher char-of-message)
+                  (str full-cipher)))
+      (base-cipher-extractor full-cipher))))
